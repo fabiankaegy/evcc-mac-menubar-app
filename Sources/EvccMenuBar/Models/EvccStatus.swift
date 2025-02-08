@@ -28,6 +28,7 @@ struct EvccStatus: Codable {
             let vehicleSoc: Double?
             let mode: String
             let connected: Bool
+            let vehicleRange: Double?
         }
     }
 } 

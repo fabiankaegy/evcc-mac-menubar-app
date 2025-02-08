@@ -11,6 +11,7 @@ class EvccState: ObservableObject {
     @Published var vehicleSoC: Double = 0
     @Published var currentMode: ChargingMode = .pv
     @Published var vehicleConnected: Bool = false
+    @Published var vehicleRange: Double = 0
     
     private var timer: Timer?
     private let expandedPollingInterval: TimeInterval = 5.0
@@ -93,8 +94,7 @@ class EvccState: ObservableObject {
             self.vehicleConnected = firstVehicle.connected
             self.vehiclePower = firstVehicle.chargePower
             self.vehicleSoC = firstVehicle.vehicleSoc ?? 0
-            
-            // Update the current mode
+            self.vehicleRange = firstVehicle.vehicleRange ?? 0
             self.currentMode = ChargingMode(apiMode: firstVehicle.mode)
         }
     }
