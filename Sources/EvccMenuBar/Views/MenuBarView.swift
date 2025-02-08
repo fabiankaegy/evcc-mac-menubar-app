@@ -6,17 +6,20 @@ struct MenuBarView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Image(systemName: "bolt.fill")
-                Text("Grid: \(formatPower(evccState.gridPower))")
+                Image(systemName: evccState.gridPower > 0 ? "arrow.down.circle.fill" : "arrow.up.circle.fill")
+                    .foregroundColor(evccState.gridPower > 0 ? .red : .green)
+                Text("\(evccState.gridPower > 0 ? "Consuming" : "Feeding"): \(formatPower(evccState.gridPower))")
             }
             
             HStack {
                 Image(systemName: "sun.max.fill")
+                    .foregroundColor(.yellow)
                 Text("Solar: \(formatPower(evccState.pvPower))")
             }
             
             HStack {
                 Image(systemName: evccState.batteryPower > 0 ? "battery.100.bolt" : "battery.100")
+                    .foregroundColor(evccState.batteryPower > 0 ? .yellow : .green)
                 Text("Battery: \(formatPower(evccState.batteryPower)) (\(Int(evccState.batterySoC))%)")
             }
             
@@ -24,6 +27,7 @@ struct MenuBarView: View {
             
             HStack {
                 Image(systemName: "bolt.car.fill")
+                    .foregroundColor(evccState.vehicleCharging ? .blue : .gray)
                 if evccState.vehicleCharging {
                     Text("Charging: \(formatPower(evccState.vehiclePower))")
                 } else {
@@ -42,6 +46,12 @@ struct MenuBarView: View {
             }
         }
         .padding()
+        .onAppear {
+            evccState.setMenuExpanded(true)
+        }
+        .onDisappear {
+            evccState.setMenuExpanded(false)
+        }
     }
     
     private func formatPower(_ power: Double) -> String {
