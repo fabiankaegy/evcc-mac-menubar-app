@@ -11,15 +11,29 @@ class EvccState: ObservableObject {
     @Published var vehicleSoC: Double = 0
     
     private var timer: Timer?
+    private let expandedPollingInterval: TimeInterval = 5.0
+    private let collapsedPollingInterval: TimeInterval = 60.0
+    private var isExpanded: Bool = false
     
     init() {
-        startPolling()
+        startPolling(expanded: false)
     }
     
-    func startPolling() {
-        timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { [weak self] _ in
+    func setMenuExpanded(_ expanded: Bool) {
+        if isExpanded != expanded {
+            isExpanded = expanded
+            startPolling(expanded: expanded)
+        }
+    }
+    
+    private func startPolling(expanded: Bool) {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: expanded ? expandedPollingInterval : collapsedPollingInterval, 
+                                   repeats: true) { [weak self] _ in
             self?.fetchStatus()
         }
+        // Fetch immediately when starting polling
+        fetchStatus()
     }
     
     func fetchStatus() {
