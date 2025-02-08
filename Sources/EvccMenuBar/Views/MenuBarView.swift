@@ -88,14 +88,10 @@ struct MenuBarView: View {
                 Image(systemName: "bolt.car.fill")
                     .foregroundColor(evccState.vehicleCharging ? .blue : .gray)
                 if evccState.vehicleCharging {
-                    Text("Charging: \(formatPower(evccState.vehiclePower))")
+                    Text("Charging: \(formatPower(evccState.vehiclePower)) (\(Int(evccState.vehicleSoC))%)")
                 } else {
-                    Text("Not Charging")
+                    Text("Not Charging (\(Int(evccState.vehicleSoC))%)")
                 }
-            }
-            
-            if evccState.vehicleSoC > 0 {
-                Text("Vehicle SoC: \(Int(evccState.vehicleSoC))%")
             }
             
             Divider()
