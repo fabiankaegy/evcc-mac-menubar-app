@@ -56,8 +56,18 @@ struct CustomSegmentedControl: View {
     }
 }
 
+struct NoArrowMenuStyle: MenuStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        Menu(configuration)
+            .menuIndicator(.hidden)
+            .menuStyle(.borderlessButton)
+            .fixedSize()
+    }
+}
+
 struct MenuBarView: View {
     @ObservedObject var evccState: EvccState
+    @State private var showingMenu = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -94,11 +104,21 @@ struct MenuBarView: View {
                 }
             }
             
-            Divider()
-            
-            Button("Quit") {
-                NSApplication.shared.terminate(nil)
+            HStack {
+                Spacer()
+                Menu {
+                    Button("Quit") {
+                        NSApplication.shared.terminate(nil)
+                    }
+                } label: {
+                    Image(systemName: "gearshape")
+                        .foregroundColor(.secondary)
+                        .imageScale(.small)
+                }
+                .menuStyle(NoArrowMenuStyle())
+                .frame(width: 16, height: 16)
             }
+            .padding(.top, 4)
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
