@@ -15,11 +15,9 @@ struct MenuBarView: View {
                 Text("Solar: \(formatPower(evccState.pvPower))")
             }
             
-            if evccState.batteryPower != 0 {
-                HStack {
-                    Image(systemName: "battery.100")
-                    Text("Battery: \(formatPower(evccState.batteryPower)) (\(Int(evccState.batterySoC))%)")
-                }
+            HStack {
+                Image(systemName: evccState.batteryPower > 0 ? "battery.100.bolt" : "battery.100")
+                Text("Battery: \(formatPower(evccState.batteryPower)) (\(Int(evccState.batterySoC))%)")
             }
             
             Divider()
@@ -38,10 +36,6 @@ struct MenuBarView: View {
             }
             
             Divider()
-            
-            Button("Settings") {
-                NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-            }
             
             Button("Quit") {
                 NSApplication.shared.terminate(nil)

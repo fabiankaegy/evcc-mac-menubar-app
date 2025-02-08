@@ -12,9 +12,5 @@ struct EvccMenuBarApp: App {
             Image(systemName: evccState.vehicleCharging ? "bolt.car.fill" : "ev.charger.slash")
         })
         .menuBarExtraStyle(.window)
-        
-        Settings {
-            SettingsView(evccState: evccState)
-        }
     }
 } 
