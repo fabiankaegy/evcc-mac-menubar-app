@@ -1,10 +1,69 @@
 import SwiftUI
 
+enum ChargingMode: String, CaseIterable {
+    case off = "Off"
+    case now = "Fast"
+    case minPv = "Min+PV"
+    case pv = "PV"
+    
+    init(apiMode: String) {
+        switch apiMode {
+        case "off": self = .off
+        case "now": self = .now
+        case "min": self = .minPv
+        case "pv": self = .pv
+        default: self = .pv
+        }
+    }
+    
+    var icon: String {
+        switch self {
+        case .off: return "power"
+        case .now: return "bolt.fill"
+        case .minPv: return "sun.min"
+        case .pv: return "sun.max"
+        }
+    }
+}
+
+struct CustomSegmentedControl: View {
+    @Binding var selection: ChargingMode
+    
+    var body: some View {
+        HStack(spacing: 1) {
+            ForEach(ChargingMode.allCases, id: \.self) { mode in
+                Button {
+                    selection = mode
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: mode.icon)
+                        Text(mode.rawValue)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 24)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, 6)
+                .background(selection == mode ? Color.accentColor : Color.clear)
+                .foregroundColor(selection == mode ? .white : .primary)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .background(Color(NSColor.separatorColor))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+}
+
 struct MenuBarView: View {
     @ObservedObject var evccState: EvccState
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
+            CustomSegmentedControl(selection: $evccState.currentMode)
+                .padding(.bottom, 2)
+            
             HStack {
                 Image(systemName: evccState.gridPower > 0 ? "arrow.down.circle.fill" : "arrow.up.circle.fill")
                     .foregroundColor(evccState.gridPower > 0 ? .red : .green)
@@ -45,12 +104,16 @@ struct MenuBarView: View {
                 NSApplication.shared.terminate(nil)
             }
         }
-        .padding()
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
         .onAppear {
             evccState.setMenuExpanded(true)
         }
         .onDisappear {
             evccState.setMenuExpanded(false)
+        }
+        .onChange(of: evccState.currentMode) { newMode in
+            evccState.setChargingMode(newMode)
         }
     }
     

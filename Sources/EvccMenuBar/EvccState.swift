@@ -9,6 +9,7 @@ class EvccState: ObservableObject {
     @Published var vehicleCharging: Bool = false
     @Published var vehiclePower: Double = 0
     @Published var vehicleSoC: Double = 0
+    @Published var currentMode: ChargingMode = .pv
     
     private var timer: Timer?
     private let expandedPollingInterval: TimeInterval = 5.0
@@ -90,6 +91,47 @@ class EvccState: ObservableObject {
             self.vehicleCharging = firstVehicle.charging
             self.vehiclePower = firstVehicle.chargePower
             self.vehicleSoC = firstVehicle.vehicleSoc ?? 0
+            
+            // Update the current mode
+            self.currentMode = ChargingMode(apiMode: firstVehicle.mode)
         }
+    }
+    
+    func setChargingMode(_ mode: ChargingMode) {
+        // Convert mode to evcc API mode string
+        let modeString = switch mode {
+        case .off: "off"
+        case .now: "now"
+        case .minPv: "minpv"
+        case .pv: "pv"
+        }
+        
+        guard let url = URL(string: "\(apiUrl)/loadpoints/1/mode/\(modeString)") else {
+            print("Invalid URL for mode change: \(apiUrl)/loadpoints/1/mode/\(modeString)")
+            return
+        }
+        
+        print("Setting charging mode to '\(modeString)' at URL: \(url)")
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        
+        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+            if let error = error {
+                print("Error setting mode: \(error.localizedDescription)")
+                return
+            }
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                print("Mode change response status: \(httpResponse.statusCode)")
+            }
+            
+            if let data = data, let responseString = String(data: data, encoding: .utf8) {
+                print("Mode change response: \(responseString)")
+            }
+            
+            // Fetch updated status after mode change
+            self?.fetchStatus()
+        }.resume()
     }
 } 

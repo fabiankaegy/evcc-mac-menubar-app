@@ -26,6 +26,7 @@ struct EvccStatus: Codable {
             let charging: Bool
             let chargePower: Double
             let vehicleSoc: Double?
+            let mode: String
         }
     }
 } 
