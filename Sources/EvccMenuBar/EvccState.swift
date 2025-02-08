@@ -10,6 +10,7 @@ class EvccState: ObservableObject {
     @Published var vehiclePower: Double = 0
     @Published var vehicleSoC: Double = 0
     @Published var currentMode: ChargingMode = .pv
+    @Published var vehicleConnected: Bool = false
     
     private var timer: Timer?
     private let expandedPollingInterval: TimeInterval = 5.0
@@ -89,6 +90,7 @@ class EvccState: ObservableObject {
         
         if let firstVehicle = status.result.loadpoints.first {
             self.vehicleCharging = firstVehicle.charging
+            self.vehicleConnected = firstVehicle.connected
             self.vehiclePower = firstVehicle.chargePower
             self.vehicleSoC = firstVehicle.vehicleSoc ?? 0
             

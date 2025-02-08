@@ -9,8 +9,18 @@ struct EvccMenuBarApp: App {
         MenuBarExtra(content: {
             MenuBarView(evccState: evccState)
         }, label: {
-            Image(systemName: evccState.vehicleCharging ? "bolt.car.fill" : "ev.charger.slash")
+            Image(systemName: menuBarIcon)
         })
         .menuBarExtraStyle(.window)
+    }
+    
+    private var menuBarIcon: String {
+        if evccState.vehicleCharging {
+            return "bolt.car.fill"
+        } else if evccState.vehicleConnected {
+            return "ev.charger"
+        } else {
+            return "ev.charger.slash"
+        }
     }
 } 
